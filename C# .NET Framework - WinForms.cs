@@ -403,6 +403,19 @@ namespace [Proyecto]
 			string Partes = "[ParteEntera]" + "," + "[ParteDecimal]";
 			double Numero = Convert.ToDouble(Partes);
 		}
+		
+		// Procedimiento para copiar texto al portapapeles
+		void CopyText(string Text)
+		{
+			try
+			{
+				Clipboard.SetText(Text);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message, String.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+			}
+		}
 	}
 }
 
