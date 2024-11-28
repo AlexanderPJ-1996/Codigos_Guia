@@ -623,7 +623,7 @@ namespace ContarDinero
         static void Main()
         {
             String ProdName = Application.ProductName;
-            Boolean CreatedNew;
+            bool CreatedNew;
             using Mutex Mtx = new(true, ProdName, out CreatedNew);
             {
                 if (CreatedNew)

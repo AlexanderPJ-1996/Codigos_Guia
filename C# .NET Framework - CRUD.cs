@@ -12,8 +12,6 @@ using System.Data.SqlClient; // SQL Server
 using System.Data.OleDb;     // Access (2003/2007-2013)
 using System.Data.SQLite;    // SQLite
 using MySqlConnector;        // MySQL
-using Devart.Data.MySql;     // MySQL (Devart)
-using Devart.Data.SQLite;    // SQLite (Devart)
 
 namespace [Proyecto]
 {
@@ -47,7 +45,7 @@ namespace [Proyecto]
 		Iniciar la conexión y almacenar la cadena de conexión (ConnectionString)
 		C# no admite la opción de usar variables para almacenar ConnectionString con el metodo actual
 		*/
-		private readonly SqlConnection Conectar = new SqlConnection(@"");
+		private readonly SqlConnection Conectar = new SqlConnection(@"[ConnectionString]");
         // Aprobar o denegar acciones en función del exito con la conexión
         public Boolean EConn, ERead, Chang;
 		
