@@ -15,7 +15,7 @@ using MySqlConnector;        // MySQL
 
 namespace [Proyecto]
 {
-    public class CRUD //Clase para procesos CRUD
+    public class Conn //Clase para procesos CRUD
     {
 		/*
 		ConnectionString: (https://www.connectionStrings.com/)
@@ -47,14 +47,14 @@ namespace [Proyecto]
 		*/
 		private readonly SqlConnection Conectar = new SqlConnection(@"[ConnectionString]");
         // Aprobar o denegar acciones en función del exito con la conexión
-        public Boolean EConn, ERead, Chang;
+        public bool EConn, ERead, Chang;
 		
 		/*
 		Se puede utilizar este método para solo declarar la cadena/connectionStrings, pero en tal caso,
 		deberá de declararse: var Conectar = new SqlConnection(Cadena); al principio de cada método que 
 		utlice la variable [Conectar]
 		*/
-		private readonly String Cadena = @"[ConnectionString]";
+		private readonly string Cadena = @"[ConnectionString]";
 		
 		public void VarConectar()
 		{
@@ -88,7 +88,7 @@ namespace [Proyecto]
         Instrucciones SQL: SELECT
         Utilizable para hacer login con usuario y contraseña almacenada en base de datos 
         */
-        public void Leer(String SQL)
+        public void Leer(string SQL)
         {
             Conectar.Open();
             try
@@ -106,7 +106,7 @@ namespace [Proyecto]
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, String.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             Conectar.Close();
         }
@@ -115,7 +115,7 @@ namespace [Proyecto]
         Instrucciones SQL: SELECT
         Mostrar datos en un DataGridView
         */
-        public void Consulta(DataGridView Tabla, String SQL)
+        public void Consulta(DataGridView Tabla, string SQL)
         {
             try
             {
@@ -126,7 +126,7 @@ namespace [Proyecto]
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, String.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 		
@@ -134,7 +134,7 @@ namespace [Proyecto]
 		Instrucciones SQL: SELECT (COUNT)
 		Mostrar Datos en un TextBox 
 		*/
-		public void TBxText(TextBox TBx, String SQL)
+		public void TBxText(TextBox TBx, string SQL)
         {
             Conectar.Open();
             try
@@ -157,7 +157,7 @@ namespace [Proyecto]
         Instrucciones SQL: SELECT
         Rellenar un ComboBox
         */
-        public DataTable Rellenar(String SQL)
+        public DataTable Rellenar(string SQL)
         {
             DataTable DT = new DataTable();
             try
@@ -174,7 +174,7 @@ namespace [Proyecto]
         }
 		
         // Instrucciones SQL: INSERT, UPDATE, DELETE, DROP y TRUNCATE TABLE. DataGridView
-        public void Operaciones(String SQL)
+        public void Operaciones(string SQL)
         {
             Conectar.Open();
             try
@@ -186,13 +186,13 @@ namespace [Proyecto]
             catch (Exception ex)
             {
                 Chang = false;
-				MessageBox.Show(ex.Message, String.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+				MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             Conectar.Close();
         }
 		
         // Instrucciones SQL: INSERT, UPDATE y DELETE. PictureBox
-        public void WorkImgs(String SQL, PictureBox Imagen)
+        public void WorkImgs(PictureBox Imagen, string SQL)
         {
             /*
             Tomar imagen de PictureBox, convertirlo en MemoryStream,
@@ -214,7 +214,7 @@ namespace [Proyecto]
             catch (Exception ex)
             {
                 Chang = false;
-				MessageBox.Show(ex.Message, String.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+				MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 Conectar.Close();
             }
         }
@@ -239,11 +239,12 @@ namespace [Proyecto]
 	public partial class [Form] : Form
 	{
 		// Variable para acceder a procesos y variables de la clase CRUD
-		CRUD CDB = new CRUD();
+		private readonly Conn cn = new Conn();
 		/*
 		.Net 5.0 en adelante
-		CRUD CDB = new();
+		private readonly Conn cn = = new();
 		*/
+		string SQL;
 		
 		public [Form]()
         {
@@ -253,28 +254,28 @@ namespace [Proyecto]
 		// Probar conexión
 		void Probar()
 		{
-			CDB.Conexion();
+			cn.Conexion();
 		}
 		
 		// Consulta SQL: CREATE TABLE para tablas en caso de que estas no existan
 		void CreTable()
 		{
-			CDB.SQL = "CREATE TABLE IF NOT EXISTS [Tabla] (([Columna 1] [TipoDato](Longitud) [NULL/NOT NULL], [Columna N] [TipoDato](Longitud) [NULL/NOT NULL], ...);";
-			Operaciones([DataGridView], CDB.SQL);
+			SQL = "CREATE TABLE IF NOT EXISTS [Tabla] (([Columna 1] [TipoDato](Longitud) [NULL/NOT NULL], [Columna N] [TipoDato](Longitud) [NULL/NOT NULL], ...);";
+			cn.Operaciones(SQL);
 		}
 		
 		// Consulta SQL: SELECT en sin cargar datos en DataGridView
 		void ReadRegs()
         {
-            CDB.SQL = "SELECT * FROM [Tabla]";
-			CDB.Leer(CDB.SQL);
+            SQL = "SELECT * FROM [Tabla]";
+			cn.Leer(SQL);
         }
 		
 		// Consulta SQL: SELECT para cargar datos DataGridView
 		void LoadRegs()
 		{
-			CDB.SQL = "SELECT * FROM [Tabla]";
-			CDB.Consulta([DataGridView], CDB.SQL);
+			SQL = "SELECT * FROM [Tabla]";
+			cn.Consulta([DataGridView], SQL);
 		}
 		
 		/*
@@ -293,19 +294,19 @@ namespace [Proyecto]
 		// Rellenar ComboBox
 		void RelleCBx()
 		{
-			CDB.SQL = "SELECT [Columna] FROM [Tabla] ORDER BY [Columna] ASC/DESC";
+			SQL = "SELECT [Columna] FROM [Tabla] ORDER BY [Columna] ASC/DESC";
 			try
             {
                 DataTable DT = new DataTable();
 				// DataTable DT = new();
-                DT = CDB.Rellenar(CDB.SQL);
+                DT = cn.Rellenar(SQL);
                 [ComboBox].DataSource = DT;
                 [ComboBox].DisplayMember = "[Columna]";
                 [ComboBox].SelectedIndex = 0;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, String.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
 		}
 		
@@ -314,32 +315,32 @@ namespace [Proyecto]
 		{
 			// DataGridView
 			// Guardar 
-			CDB.SQL = "INSERT INTO [Tabla] ([Columna 1], [Columna 2],... [Columna N]) SELECT " + [Dato 1] + ", " + [Dato 2] + ",... " + [Dato N];
+			SQL = "INSERT INTO [Tabla] ([Columna 1], [Columna 2],... [Columna N]) SELECT " + [Dato 1] + ", " + [Dato 2] + ",... " + [Dato N];
 			// Actualizar
-			CDB.SQL = "UPDATE [Tabla] SET [Columna 1] = " + [Dato 1] + ", [Columna 2] = " + [Dato 2] + ",... Columna N = " + [Dato N] + " WHERE ([Criterio] = " + [Criterio] + ")";
+			SQL = "UPDATE [Tabla] SET [Columna 1] = " + [Dato 1] + ", [Columna 2] = " + [Dato 2] + ",... Columna N = " + [Dato N] + " WHERE ([Criterio] = " + [Criterio] + ")";
 			// Eliminar
-			CDB.SQL = "DELETE FROM [Tabla] WHERE ([Criterio]=" + [Criterio] + ")";
+			SQL = "DELETE FROM [Tabla] WHERE ([Criterio]=" + [Criterio] + ")";
 			// Vaciar tablas
-			CDB.SQL = "TRUNCATE TABLE [Tabla]";
-			CDB.Operaciones([DataGridView], CDB.SQL);
+			SQL = "TRUNCATE TABLE [Tabla]";
+			cn.Operaciones([DataGridView], SQL);
 			
 			// PictureBox
 			// Guardar
-			CDB.SQL = "INSERT INTO [Tabla] ([Columna 1], [Columna 2],... [Columna N]) VALUES (" + [Dato 1] + ", " + [Dato 2] + ",... " + [Dato N] + ", @Imagen)";
+			SQL = "INSERT INTO [Tabla] ([Columna 1], [Columna 2],... [Columna N]) VALUES (" + [Dato 1] + ", " + [Dato 2] + ",... " + [Dato N] + ", @Imagen)";
 			// Actualizar
-			CDB.SQL = "UPDATE [Tabla] SET [Columna 1] = " + [Dato 1] + ", [Columna 2] = " + [Dato 2] + ",... Columna N = " + [Dato N] + " [Columna] = @Imagen WHERE ([Criterio] = " + [Criterio] + ")";
+			SQL = "UPDATE [Tabla] SET [Columna 1] = " + [Dato 1] + ", [Columna 2] = " + [Dato 2] + ",... Columna N = " + [Dato N] + " [Columna] = @Imagen WHERE ([Criterio] = " + [Criterio] + ")";
 			// Eliminar
-			CDB.SQL = "DELETE FROM [Tabla] WHERE ([Criterio]=" + [Criterio] + ")";
-			WorkImgs(CDB.SQL, [PictureBox]);
+			SQL = "DELETE FROM [Tabla] WHERE ([Criterio]=" + [Criterio] + ")";
+			cn.WorkImgs([PictureBox], SQL);
 		}
 		
 		// Consulta SQL: TRUNCATE TABLE en SQLite
 		void TruncarSQLite()
 		{
-			CDB.SQL = "DROP TABLE [Tabla]";
-			CDB.Operaciones([DataGridView], CDB.SQL);
-			CDB.SQL = "CREATE TABLE [Tabla] ([Columna 1] [TipoDato](Longitud) [NULL/NOT NULL], [Columna N] [TipoDato](Longitud) [NULL/NOT NULL], ...);";
-			CDB.Operaciones([DataGridView], CDB.SQL);
+			SQL = "DROP TABLE [Tabla]";
+			cn.Operaciones([DataGridView], SQL);
+			SQL = "CREATE TABLE [Tabla] ([Columna 1] [TipoDato](Longitud) [NULL/NOT NULL], [Columna N] [TipoDato](Longitud) [NULL/NOT NULL], ...);";
+			cn.Operaciones(SQL);
 		}
 	}
 }

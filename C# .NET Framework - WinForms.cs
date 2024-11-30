@@ -93,8 +93,6 @@ namespace [Proyecto]
 			// Hacer que no pueda modificarse el texto de un TextBox/RichTextBox
 			[TextBox].ReadOnly = true/false;
 			[RichTextBox].ReadOnly = true/false;
-			
-			
 		}
 		
 		// Solo recibir numeros sin espacios vacios en un TextBox (int 0), mediante evento KeyPress
@@ -145,7 +143,7 @@ namespace [Proyecto]
 				// Mostrar datos texto en un Label/TextBox/Variable
 				[Label/TextBox] = [DataGridView].CurrentRow.Cells[Columna].Value.ToString();
 				// Mostrar datos bit/boolean en un CheckBox
-				object [Variable] = [DataGridView].CurrentRow.Cells[Columna].Value;
+				var [Variable] = [DataGridView].CurrentRow.Cells[Columna].Value;
 				[CheckBox].Checked = Convert.ToBoolean([Variable]);
 				// Mostrar datos blob/longblob/varbinary en un PictureBox
 				var [Variable 1] = (Byte[])[DataGridView].CurrentRow.Cells[Columna].Value;
@@ -295,14 +293,14 @@ namespace [Proyecto]
 		}
 		
 		// Abrir formularios para una unica pantalla
-		private void AbrirForm(object FormA)
+		private void AbrirForm(object Modulo)
         {
             // Vaciar panel en caso de tener otro form abierto
 			if ([Panel].Controls.Count > 0)
             {
                 [Panel].Controls.RemoveAt(0);
             }
-            Form [Variable] = FormA as Form;
+            Form [Variable] = Modulo as Form;
             [Variable].TopLevel = false;
             [Variable].Dock = DockStyle.Fill;
             [Variable].BackColor = BackColor;
@@ -393,7 +391,7 @@ namespace [Proyecto]
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, String.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 		
@@ -413,7 +411,7 @@ namespace [Proyecto]
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message, String.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+				MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 			}
 		}
 	}
@@ -572,8 +570,7 @@ namespace [Proyecto]
 		
 		void RemoverVacio()
 		{
-			[String sin Espacios] = Regex.Replace([String sin Espacios], @"\s", String.Empty);
-
+			[String sin Espacios] = Regex.Replace([String con Espacios], @"\s", String.Empty);
 		}
 	}
 }
@@ -622,7 +619,7 @@ namespace ContarDinero
         [STAThread]
         static void Main()
         {
-            String ProdName = Application.ProductName;
+            string ProdName = Application.ProductName;
             bool CreatedNew;
             using Mutex Mtx = new(true, ProdName, out CreatedNew);
             {

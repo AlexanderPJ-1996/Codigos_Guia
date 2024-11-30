@@ -1,5 +1,6 @@
 /*
-Este es el paso a paso para captar 
+Este es el paso a paso para captar datos de una tabla para alimentar un componente BindingSource
+para cargar un ReportViewer
 */
 
 // Clase para representar las columnas de una tabla en una base de datos
@@ -14,6 +15,7 @@ namespace [Proyecto]
 		public DateTime [DateTime] { get; set; }
 		public double [DOUBLE/DECIMAL] { get; set; }
 		public bool [BOOLEAN/BIT] { get; set; }
+		public byte[] [BYTE] { get; set; }
 	}
 }
 
@@ -28,16 +30,14 @@ namespace [Proyecto]
 {
 	public class Datos_Tabla
 	{
-		string SQL;
-		
 		public List<ClaseTabla> Listar()
 		{
-			public List<ClaseTabla> Lista = new List<ClaseTabla>();
+			List<ClaseTabla> Lista = new List<ClaseTabla>();
 			using (SqlConnection Conectar = new SqlConnection(@"[ConnectionString]"))
 			{
 				try
 				{
-					SQL = "[Consulta SQL SELECT]";
+					string SQL = "[Consulta SQL SELECT]";
 					SqlCommand CMD = new SqlCommand(SQL, Conectar);
 					CMD.CommandType = CommandType.Text;
 					Conectar.Open();
@@ -45,13 +45,14 @@ namespace [Proyecto]
 					{
 						while (DR.Read())
 						{
-							Lista.Add(new Tabla.TPerso()
+							Lista.Add(new ClaseTabla()
 							{
 								[INTEGER/BIGINT] = Convert.ToInt32(DR["[INTEGER/BIGINT]"]),
 								[VARCHAR] = DR["[VARCHAR]"].ToString(),
 								[DOUBLE/DECIMAL] = Convert.ToDouble/ToDecimal(DR["[DOUBLE/DECIMAL]"]),
 								[DateTime] = Convert.ToDateTime(DR["[DateTime]"]),
-								[BOOLEAN/BIT] = Convert.ToBoolean(DR["[BOOLEAN/BIT]"])
+								[BOOLEAN/BIT] = Convert.ToBoolean(DR["[BOOLEAN/BIT]"]),
+								[BYTE] = (byte[])DR["BYTE"]
 							});
 						}
 					}
