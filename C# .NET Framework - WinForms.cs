@@ -544,14 +544,14 @@ namespace System.Cryp
 {
     public class EramCryp
     {
-        public String TxEncryp, TxDecryp;
+        public string TxEncryp, TxDecryp;
 
-        public void Encryp(String Texto)
+        public void Encryp(string Texto)
         {
             TxEncryp = eCryptography.Encrypt(Texto);
         }
 
-        public void Decryp(String Texto)
+        public void Decryp(string Texto)
         {
             TxDecryp = eCryptography.Decrypt(Texto);
         }
@@ -570,7 +570,7 @@ namespace [Proyecto]
 		
 		void RemoverVacio()
 		{
-			[String sin Espacios] = Regex.Replace([String con Espacios], @"\s", String.Empty);
+			[String sin Espacios] = Regex.Replace([String con Espacios], @"\s", string.Empty);
 		}
 	}
 }
@@ -612,7 +612,7 @@ using System;
 using System.Windows.Forms;
 using System.Threading;
 
-namespace ContarDinero
+namespace [Proyecto]
 {
     static class Program
     {
@@ -632,9 +632,40 @@ namespace ContarDinero
                 }
                 else
                 {
-                    MessageBox.Show(Application.ProductName + ": Instancia abierta", String.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(Application.ProductName + " - Instancia abierta", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
     }
+}
+
+// Procedimiento para leer el texto de un archivo de texto y almacenarlo en una variable
+using System.IO;
+using System.Windows.Forms;
+
+namespace [Proyecto]
+{
+	public class LeerFileText
+	{
+		string [Variable];
+		void FileText()
+		{
+			string Line;
+			try
+			{
+				StreamReader SR = new StreamReader("[Archivo]");
+				Line = SR.ReadLine();
+				while (Line != null)
+				{
+					[Variable] = Line;
+					Line = SR.ReadLine();
+				}
+				SR.Close();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+			}
+		}
+	}
 }

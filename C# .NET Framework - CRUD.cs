@@ -218,6 +218,34 @@ namespace [Proyecto]
                 Conectar.Close();
             }
         }
+		
+		// Instrucciones SQL: INSERT, UPDATE y DELETE con parámetros incluidos 
+		void InUpDe(string [Columna 1], int [Columna 2], byte[] [Columna3])
+        {
+            using (var Conectar = new SqlConnection(cn.Cadena))
+            {
+                string SQL = "INSERT INTO [Tabla] ([Columna 1], [Columna 3]) VALUES (@[Columna 1], @[Columna 3])";
+				string SQL = "UPDATE [Tabla] SET [Columna 1] = @[Columna 1], [Columna 3] = @[Columna 3] WHERE ([Columna 2] = @[Columna 2])";
+				string SQL = "DELETE FROM [Tabla] WHERE ([Columna 2] = @[Columna 2])";
+                SqlCommand CMD = new SqlCommand(SQL, Conectar);
+                CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
+                CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
+                CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
+                try
+                {
+                    Conectar.Open();
+                    CMD.ExecuteNonQuery();
+                    Conectar.Close();
+                    Chang = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    Conectar.Close();
+                    Chang = false;
+                }
+            }
+        }
     }
 }
 
