@@ -23,20 +23,10 @@ namespace [Proyecto]
 		string [Variable];
 		// Declarar variable de acceso público
 		public string [Variable];
+		// Declarar variable de solo lectura
+		readonly string [Variable];
 		// Variable para acceder a procesos y variables de otra
-		[Clase] [Variable] = new [Clase]();
-		
-		// Procedimiento
-		void [Procedimiento]()
-		{
-			
-		}
-		
-		// Procedimiento de acceso público
-		public void [Procedimiento]()
-		{
-			
-		}
+		private readonly [Clase] [Variable] = new [Clase]();
 		
 		// Obtener información de ensamblado de aplicación/Proyecto
 		void AppInfo()
@@ -53,12 +43,7 @@ namespace [Proyecto]
 			[ComboBox].DropDownStyle = ComboBoxStyle.DropDownList;
             [ComboBox].FlatStyle = FlatStyle.Popup;
 			
-			// Agregar elementos a un ComboBox de forma manual
-			// Agregar elemento por elemento
-			[ComboBox].Items.Add("Elemento 1");
-            [ComboBox].Items.Add("Elemento 2");
-            [ComboBox].Items.Add("Elemento N");
-			// Agregar desde una lista de elementos
+			// Agregar elementos desde una lista de elementos
 			List<string> [Variable] = new List<string>
             {
                 [Elemento 1], 
@@ -72,12 +57,6 @@ namespace [Proyecto]
 			[ComboBox].Items.Clear();
 			[ComboBox].ResetText();
         }
-		
-		// Perzonalizar control DateTimePicker
-		void DTPItems()
-		{
-			
-		}
 		
 		// Personalizar control TextBox desde código
 		void TBxProps()
@@ -106,6 +85,31 @@ namespace [Proyecto]
 		{
 			e.Handled = !(char.IsLetter(e.KeyChar)) && (e.KeyChar != (char)Keys.Back);
 		}
+		
+		// asegura que el TextBox solo acepte números, un solo punto decimal
+        // y hasta dos dígitos después del punto
+        void DecimText(object sender, KeyPressEventArgs e)
+        {
+            // Permitir solo números, un punto decimal y teclas de control
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                e.Handled = true;
+            }
+            // Permitir solo un punto decimal
+            if ((e.KeyChar == '.') && ((sender as TextBox).Text.IndexOf('.') > -1))
+            {
+                e.Handled = true;
+            }
+            // Permitir solo dos dígitos después del punto decimal
+            if ((sender as TextBox).Text.Contains("."))
+            {
+                string[] parts = (sender as TextBox).Text.Split('.');
+                if (parts.Length > 1 && parts[1].Length >= 2 && !char.IsControl(e.KeyChar))
+                {
+                    e.Handled = true;
+                }
+            }
+        }
 		
 		// Realizar cálculos básicos con TextBox/Variable
 		void Calcular()
@@ -174,20 +178,13 @@ namespace [Proyecto]
 			[DataGridView].Columns.Clear();
 		}
 		
-		// Proceso para string como arreglo de bytes
-		void ConvertStringToBytes()
-		{
-			// Convertir string en bytes
-			byte[] Bytes = Encoding.UTF8.GetBytes([Variable/TextBox]);
-			[Variable/TextBox] = BitConverter.ToString(Bytes);
-			// Restaurar string desde bytes
-			[Variable/TextBox] = UTF8Encoding.UTF8.GetString(Bytes);
-		}
-		
 		// MessageBox.Show
 		void MessageBoxShow()
 		{
+			// MessageBox con texto, sin título
 			MessageBox.Show("");
+			// MessageBox con texto, y con título
+			MessageBox.Show("", "");
 			// MessageBox con iconos del sistema
 			MessageBox.Show("", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation); // Mensaje de exclamación
 			MessageBox.Show("", "", MessageBoxButtons.OK, MessageBoxIcon.Question);    // Mensaje de interrogación
@@ -272,7 +269,7 @@ namespace [Proyecto]
 		}
 		
 		// Configurar un OpenFileDialog en un para cargar una imagen en un PictureBox
-		void OFile()
+		void OpenFile()
 		{
 			OpenFileDialog [Variable] = new OpenFileDialog
 			{
@@ -286,11 +283,49 @@ namespace [Proyecto]
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
+			
             if ([Variable].ShowDialog() == DialogResult.OK)
             {
-                [PictureBox].Image = Image.FromFile([Variable].FileName);
+                try
+				{
+					[PictureBox].Image = Image.FromFile([Variable].FileName);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+				}
             }
 		}
+		
+		// Configurar SaveFileDialog para guardar imagen desde un PictureBox
+		void SaveFile()
+        {
+            SaveFileDialog SaveDialog = new SaveFileDialog
+            {
+                Filter = "Imagenes PNG|*.png|" +
+                "Imagenes JPG/JPEG|*.jpg;*.jpeg|" +
+                "Imagenes GIF|*.gif|" +
+                "Imagenes BMP|*.bmp|" +
+                "Imagenes TIFF|*.tif;*.tiff|" +
+                "Todos los archivos|*.*",
+                Title = "Guardar imagen",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+			
+            if (SaveDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    Image Img = PBxImage.Image;
+                    Img.Save(SaveDialog.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+            }
+        }
 		
 		// Abrir formularios para una unica pantalla
 		private void AbrirForm(object Modulo)
@@ -313,25 +348,6 @@ namespace [Proyecto]
 		void Abrir()
 		{
 			AbrirForm(new [Form]());
-		}
-		
-		// Calcular edad a partir de DateTimePicker
-		void CalcEdad()
-		{
-			// double TotalDays = (EndDate - StartDate).TotalDays;
-			// Calcular la diferencia de días entre 2 fechas
-			double Dias = Convert.ToDouble((DateTime.Today - [DateTimePicker].Value).TotalDays);
-			// Convertir diferencia de días a años (365.25 días)
-			// Math.Truncate elimina los decimales, mostrando solo la parte entera
-			double Edad = Math.Truncate(Dias / 365.25);
-			// Mostrar edad como texto
-			[TextBox/Variable] = Edad.ToString();
-		}
-		
-		// Unir cadenas string &
-		void UnirCadenas()
-		{
-			[String] = String.Concat([String 1] , [String 2]),... [String N];
 		}
 		
 		// Instrucción Show para mostrar Forms, similar al llamdo de clase
@@ -373,10 +389,26 @@ namespace [Proyecto]
 			[Variable].BringToFront();
         }
 		
-		/*
-		Procedimiento para captar y separar parte entera y decimales 
-		de un número decimal
-		*/
+		// Calcular edad a partir de DateTimePicker
+		void CalcEdad()
+		{
+			// double TotalDays = (EndDate - StartDate).TotalDays;
+			// Calcular la diferencia de días entre 2 fechas
+			double Dias = Convert.ToDouble((DateTime.Today - [DateTimePicker].Value).TotalDays);
+			// Convertir diferencia de días a años (365.25 días)
+			// Math.Truncate elimina los decimales, mostrando solo la parte entera
+			double Edad = Math.Truncate(Dias / 365.25);
+			// Mostrar edad como texto
+			[TextBox/Variable] = Edad.ToString();
+		}
+		
+		// Unir cadenas string &
+		void UnirCadenas()
+		{
+			[String] = String.Concat([String 1] , [String 2]),... [String N];
+		}
+		
+		// Procedimiento para captar y separar parte entera y decimales de un número decimal
 		string NumText, NumEntero, NumDecimal;
         string[] TextSplit;
         void CaptarIntDec(double Numero)
@@ -516,18 +548,18 @@ namespace [Proyecto]
 {
     public class MetodoEcriptar2
     {
-        string Resultado = String.Empty;
+        string Resultado = string.Empty;
 		
-        public string Encriptar(string TxtNoEnc)
+        public string Encry(string TxtNocry)
         {
-            byte[] Encriptado = Encoding.Unicode.GetBytes(TxtNoEnc);
+            byte[] Encriptado = Encoding.Unicode.GetBytes(TxtNocry);
             Resultado = Convert.ToBase64String(Encriptado);
             return Resultado;
         }
 		
-        public string Desencriptar(string TxtEncri)
+        public string Decry(string TxtEncry)
         {
-            byte[] Desencriptado = Convert.FromBase64String(TxtEncri);
+            byte[] Desencriptado = Convert.FromBase64String(TxtEncry);
             Resultado = Encoding.Unicode.GetString(Desencriptado);
             return Resultado;
         }
@@ -570,7 +602,7 @@ namespace [Proyecto]
 		
 		void RemoverVacio()
 		{
-			[String sin Espacios] = Regex.Replace([String con Espacios], @"\s", string.Empty);
+			[String sin Espacios] = Regex.Replace("String con Espacios]", @"\s", string.Empty);
 		}
 	}
 }
@@ -601,7 +633,7 @@ namespace [Proyecto]
             }
             else
             {
-                MessageBox.Show(Application.ProductName + ": Instancia abierta", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Instancia abierta", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }
@@ -632,7 +664,7 @@ namespace [Proyecto]
                 }
                 else
                 {
-                    MessageBox.Show(Application.ProductName + " - Instancia abierta", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Instancia abierta", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
