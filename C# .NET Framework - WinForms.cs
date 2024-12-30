@@ -362,12 +362,16 @@ namespace [Proyecto]
 		// Cerrar/Ocultar Forms
 		void EndProj()
 		{
-			// Equivalente End
-			Environment.Exit(0);
-			// Equivalente Me.Close()
-			this.Close();
 			// Ocultar
 			this.Hide();
+			// Cerrar
+			this.Close();
+			// Equivalente End
+			Environment.Exit(0);
+			// Cerrar aplicación/proyecto
+			Application.Exit();
+			// Reiniciar aplicación/proyecto
+			Application.Restart();
 		}
 		
 		// Mostrar Form al cerrar otro Form sin necesidad de un evento FormClosed
@@ -567,7 +571,7 @@ namespace [Proyecto]
 }
 
 /*
-Este proceso solo sirve para encriptar los datos con la librería/paquete Eramake.eCryptography
+Este proceso solo sirve para encriptar los datos con la librería Eramake.eCryptography
 https://www.nuget.org/packages/Eramake.eCryptography/
 */
 using Eramake;
@@ -590,6 +594,67 @@ namespace System.Cryp
     }
 }
 
+// Métodos para encriptar y desencriptar texto utilizando el algoritmo AES (Advanced Encryption Standard)
+using System.Text;
+using System.IO;
+using System.Security.Cryptography;
+
+namespace System.oCryp
+{
+    public class AESCry
+    {
+		// Encryption Key (clave de cifrado)
+		private static readonly string key = "0123456789012345"; // Debe ser de 16, 24 o 32 caracteres
+        // Initialization Vector (vector de inicialización)
+		private static readonly string iv = "5432109876543210";  // Debe ser de 16 caracteres
+		
+        public static string Encry(string Nocry)
+        {
+            using (Aes AESAlg = Aes.Create())
+            {
+                AESAlg.Key = Encoding.UTF8.GetBytes(key);
+                AESAlg.IV = Encoding.UTF8.GetBytes(iv);
+
+                ICryptoTransform Encryptor = AESAlg.CreateEncryptor(AESAlg.Key, AESAlg.IV);
+
+                using (MemoryStream MSe = new MemoryStream())
+                {
+                    using (CryptoStream CSe = new CryptoStream(MSe, Encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter SWe = new StreamWriter(CSe))
+                        {
+                            SWe.Write(Nocry);
+                        }
+                        return Convert.ToBase64String(MSe.ToArray());
+                    }
+                }
+            }
+        }
+		
+        public static string Decry(string Encry)
+        {
+            using (Aes AESAlg = Aes.Create())
+            {
+                AESAlg.Key = Encoding.UTF8.GetBytes(key);
+                AESAlg.IV = Encoding.UTF8.GetBytes(iv);
+
+                ICryptoTransform Decryptor = AESAlg.CreateDecryptor(AESAlg.Key, AESAlg.IV);
+
+                using (MemoryStream MSd = new MemoryStream(Convert.FromBase64String(Encry)))
+                {
+                    using (CryptoStream CSd = new CryptoStream(MSd, Decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader SRd = new StreamReader(CSd))
+                        {
+                            return SRd.ReadToEnd();
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 // Procedimiento para eliminar espacios en blanco de un string
 using System.Text;
 using System.Text.RegularExpressions;
@@ -602,7 +667,7 @@ namespace [Proyecto]
 		
 		void RemoverVacio()
 		{
-			[String sin Espacios] = Regex.Replace("String con Espacios]", @"\s", string.Empty);
+			[String sin Espacios] = Regex.Replace("String con Espacios", @"\s", string.Empty);
 		}
 	}
 }
@@ -700,4 +765,79 @@ namespace [Proyecto]
 			}
 		}
 	}
+}
+
+/*
+Procedimiento para capturar la cámara web y tomar una foto con las librería AForge.NET
+AForge.Video: 
+AForge.Video.DirectShow: 
+*/
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+using AForge.Video;
+using AForge.Video.DirectShow;
+
+namespace [Proyecto]
+{
+    public partial class [Form] : Form
+    {
+        private FilterInfoCollection VidDevices;
+        private VidCaptureDevice VidSource;
+		
+        public YourForm()
+        {
+            InitializeComponent();
+            LoadDevices();
+        }
+		
+        private void LoadDevices()
+        {
+            VidDevices = new FilterInfoCollection(FilterCategory.VidInputDevice);
+            foreach (FilterInfo Device in VidDevices)
+            {
+                [ComboBox].Items.Add(Device.Name);
+            }
+            [ComboBox].SelectedIndex = 0;
+        }
+		
+        private void [Button]_Click(object sender, EventArgs e)
+        {
+            VidSource = new VidCaptureDevice(VidDevices[[ComboBox].SelectedIndex].MonikerString);
+            VidSource.NewFrame += new NewFrameEventHandler(VidSource_NewFrame);
+            VidSource.Start();
+        }
+		
+        private void VidSource_NewFrame(object sender, NewFrameEventArgs eventArgs)
+        {
+            Bitmap BitMp = (Bitmap)eventArgs.Frame.Clone();
+            [PictureBox_Video].Image = BitMp;
+        }
+		
+        private void [Button]_Click(object sender, EventArgs e)
+        {
+            if ([PictureBox_Video].Image != null)
+            {
+                [PictureBox_Photo].Image = (Bitmap)[PictureBox_Video].Image.Clone();
+            }
+        }
+		
+        private void [Button]_Click(object sender, EventArgs e)
+        {
+            if (VidSource != null && VidSource.IsRunning)
+            {
+                VidSource.SignalToStop();
+                VidSource.WaitForStop();
+            }
+        }
+		
+        private void YourForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (VidSource != null && VidSource.IsRunning)
+            {
+                VidSource.SignalToStop();
+                VidSource.WaitForStop();
+            }
+        }
+    }
 }

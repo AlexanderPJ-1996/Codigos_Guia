@@ -201,28 +201,27 @@ namespace [Proyecto]
 		// Instrucciones SQL: INSERT, UPDATE y DELETE, DROP y TRUNCATE TABLE con parámetros incluidos
 		void InUpDe(string [Columna 1], int [Columna 2], byte[] [Columna3])
         {
-            using (var Conectar = new SqlConnection(Cadena))
+            using (var Conexion = new SqlConnection(Cadena))
             {
-                string QIns = "INSERT INTO [Tabla] ([Columna 1], [Columna 3]) VALUES (@[Columna 1], @[Columna 3])";
-				string QUpd = "UPDATE [Tabla] SET [Columna 1] = @[Columna 1], [Columna 3] = @[Columna 3] WHERE ([Columna 2] = @[Columna 2])";
-				string QDel = "DELETE FROM [Tabla] WHERE ([Columna 2] = @[Columna 2])";
-                SqlCommand CMD = new SqlCommand([Variable], Conectar);
-                CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
-                CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
-                CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
-                try
-                {
-                    Conectar.Open();
-                    CMD.ExecuteNonQuery();
-                    Conectar.Close();
-                    Chang = true;
-                }
-                catch (SqlException ex)
-                {
-                    MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    Conectar.Close();
-                    Chang = false;
-                }
+                Conexion.Open();
+				try
+				{
+					string QIns = "INSERT INTO [Tabla] ([Columna 1], [Columna 3]) VALUES (@[Columna 1], @[Columna 3])";
+					string QUpd = "UPDATE [Tabla] SET [Columna 1] = @[Columna 1], [Columna 3] = @[Columna 3] WHERE ([Columna 2] = @[Columna 2])";
+					string QDel = "DELETE FROM [Tabla] WHERE ([Columna 2] = @[Columna 2])";
+					SqlCommand CMD = new SqlCommand([Variable], Conexion);
+					CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
+					CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
+					CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
+					CMD.ExecuteNonQuery();
+					Chang = true;
+				}
+				catch (SqlException ex)
+				{
+					MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+					Chang = false;
+				}
+				Conexion.Close();
             }
         }
     }
