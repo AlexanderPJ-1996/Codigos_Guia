@@ -93,3 +93,15 @@ GROUP BY 'Nombre_Columna1';
 SELECT 'Nombre_Columna1', GROUP_CONCAT('Nombre_Columna2' SEPARATOR ', ') AS 'Nombre_Columna' 
 FROM 'Nombre_Tabla' 
 GROUP BY 'Nombre_Columna1';
+
+
+
+-- Instrucciones para mostrar tablas existentes en bases de datos
+--
+
+-- Microsoft SQL Server 
+SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';
+-- MySQL/MariaDB
+SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'
+-- SQLite
+SELECT name FROM sqlite_master WHERE type = 'table'

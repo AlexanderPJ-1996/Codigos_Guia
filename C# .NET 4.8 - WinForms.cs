@@ -1,4 +1,4 @@
-// Librerías estandar de un Form
+// Librerías estandar de un Windows Form
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace [Proyecto]
 {
@@ -37,7 +38,7 @@ namespace [Proyecto]
         }
 		
 		// Personalizar control ComboBox desde código
-		void CBxItems()
+		void ComboBoxItems()
         {
             // Impedir editar texto de los elementos dentros de un ComboBox
 			[ComboBox].DropDownStyle = ComboBoxStyle.DropDownList;
@@ -59,7 +60,7 @@ namespace [Proyecto]
         }
 		
 		// Personalizar control TextBox desde código
-		void TBxProps()
+		void TextBoxProps()
 		{
 			//CharacterCasing
 			[TextBox].CharacterCasing = CharacterCasing.[Upper/Normal/Lower];
@@ -74,6 +75,19 @@ namespace [Proyecto]
 			[RichTextBox].ReadOnly = true/false;
 		}
 		
+		void PictureBoxProps()
+		{
+			// Validar si un PictureBox tiene o no una imagen
+			if ([PictureBox].Image == null)
+			{
+				
+			}
+			// Convertir imagen de un PictureBox en un arreglo de bytes[] con librería System.IO
+			MemoryStream MS = new MemoryStream();
+			[PictureBox].Image.Save(MS, [PictureBox].Image.RawFormat);
+			byte[] Bytes = MS.GetBuffer();
+		}
+		
 		// Solo recibir numeros sin espacios vacios en un TextBox (int 0), mediante evento KeyPress
 		public void OnlyInts(KeyPressEventArgs e)
 		{
@@ -86,8 +100,10 @@ namespace [Proyecto]
 			e.Handled = !(char.IsLetter(e.KeyChar)) && (e.KeyChar != (char)Keys.Back);
 		}
 		
-		// asegura que el TextBox solo acepte números, un solo punto decimal
-        // y hasta dos dígitos después del punto
+		/*
+        Asegura que el TextBox solo acepte números, un solo punto decimal 
+        y hasta 2 dígitos después del punto
+        */
         void DecimText(object sender, KeyPressEventArgs e)
         {
             // Permitir solo números, un punto decimal y teclas de control
@@ -100,7 +116,7 @@ namespace [Proyecto]
             {
                 e.Handled = true;
             }
-            // Permitir solo dos dígitos después del punto decimal
+            // Permitir solo 2 dígitos después del punto decimal
             if ((sender as TextBox).Text.Contains("."))
             {
                 string[] parts = (sender as TextBox).Text.Split('.');
@@ -150,9 +166,9 @@ namespace [Proyecto]
 				var [Variable] = [DataGridView].CurrentRow.Cells[Columna].Value;
 				[CheckBox].Checked = Convert.ToBoolean([Variable]);
 				// Mostrar datos blob/longblob/varbinary en un PictureBox
-				var [Variable 1] = (Byte[])[DataGridView].CurrentRow.Cells[Columna].Value;
-				var [Variable 2] = new MemoryStream([Variable 1);
-				[PictureBox].Image = Image.FromStream([Variable 2]);
+				byte[] Bytes = (byte[])[DataGridView].CurrentRow.Cells[Columna].Value;
+				MemoryStream MS = new MemoryStream(Bytes);
+				[PictureBox].Image = Image.FromStream(MS);
 			}
 			catch(Exception ex)
 			{
@@ -271,8 +287,8 @@ namespace [Proyecto]
 		// Configurar un OpenFileDialog en un para cargar una imagen en un PictureBox
 		void OpenFile()
 		{
-			OpenFileDialog [Variable] = new OpenFileDialog
-			{
+			OpenFileDialog OFileD = new OpenFileDialog
+            {
                 Filter = "Imagenes PNG|*.png|" +
                 "Imagenes JPG/JPEG|*.jpg;*.jpeg|" +
                 "Imagenes GIF|*.gif|" +
@@ -284,16 +300,16 @@ namespace [Proyecto]
                 RestoreDirectory = true
             };
 			
-            if ([Variable].ShowDialog() == DialogResult.OK)
+            if (OFileD.ShowDialog() == DialogResult.OK)
             {
                 try
-				{
-					[PictureBox].Image = Image.FromFile([Variable].FileName);
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-				}
+                {
+                    [PictureBox].Image = Image.FromFile(OFileD.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
             }
 		}
 		
@@ -328,20 +344,20 @@ namespace [Proyecto]
         }
 		
 		// Abrir formularios para una unica pantalla
-		private void AbrirForm(object Modulo)
+		private void AbrirForm(object Modulo, Panel Pnl)
         {
             // Vaciar panel en caso de tener otro form abierto
-			if ([Panel].Controls.Count > 0)
+			if (Pnl.Controls.Count > 0)
             {
-                [Panel].Controls.RemoveAt(0);
+                Pnl.Controls.RemoveAt(0);
             }
-            Form [Variable] = Modulo as Form;
-            [Variable].TopLevel = false;
-            [Variable].Dock = DockStyle.Fill;
-            [Variable].BackColor = BackColor;
-            [Panel].Controls.Add([Variable]);
-            [Panel].Tag = [Variable];
-            [Variable].Show();
+            Form Frm = Modulo as Form;
+            Frm.TopLevel = false;
+            Frm.Dock = DockStyle.Fill;
+            Frm.BackColor = BackColor;
+            Pnl.Controls.Add(Frm);
+            Pnl.Tag = Frm;
+            Frm.Show();
         }
 		
 		// Mostrar respectivo Form llamando 'AbrirForm'
@@ -453,6 +469,37 @@ namespace [Proyecto]
 	}
 }
 
+// Procedimiento para abrir una url como hipervínculo
+using System;
+using System.Diagnostics;
+using System.Windows.Forms;
+
+namespace [Proyecto]
+{
+	partial class [Form] : Form
+	{
+		public [Form]()
+        {
+            InitializeComponent();
+        }
+		
+		void OpenUrl(string UrlW)
+		{
+			try
+			{
+				if (Uri.IsWellFormedUriString(UrlW, UriKind.Absolute))
+				{
+					Process.Start(new ProcessStartInfo(UrlW) { UseShellExecute = true });
+				}
+			}
+			catch (Exception)
+			{
+				MessageBox.Show("URL No Válida", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			}
+		}
+	}
+}
+
 // Dar formato moneda al texto de un Label/TextBox
 using System.Globalization;
 
@@ -462,11 +509,15 @@ namespace [Proyecto]
 	{
 		void Formatear()
 		{
-			string [Variable] = "[Texto]"
+			//
+			int [Variable] = Convert.ToInt32("[Texto]");
 			[Label/TextBox].Text = [Variable].ToString("C", CultureInfo.CurrentCulture);  // Con decimales
 			[Label/TextBox].Text = [Variable].ToString("C0", CultureInfo.CurrentCulture); // Sin decimales
 			[Label/TextBox].Text = [Variable].ToString("C2", CultureInfo.CurrentCulture); // Con 2 decimales
 			[Label/TextBox].Text = [Variable].ToString("C4", CultureInfo.CurrentCulture); // con 4 decimales
+			
+			// Mostrar formato miles sin decimales
+			[Label/TextBox].Text = [Variable].ToString("C0", CultureInfo.CurrentCulture); // Sin decimales
 		}
 	}
 }
@@ -520,95 +571,92 @@ namespace [Proyecto]
     }
 }
 
-/*
-Este proceso solo sirve para encriptar los datos en MD5/SHA256/SHA512
-Para el proceso de encriptación, se debe agregar la librería/paquete NuGet OC.Core.Crypto
-https://www.nuget.org/packages/OC.Core.Crypto/
-*/
-using OC.Core.Crypto;
-
-namespace [Proyecto]
-{
-	class MetodoEcriptar1
-    {
-        public string [String Sin Encriptar], [String Encriptado];
-		
-		// Encriptado MD5/SHA256/SHA512
-        public void Metodo_MD5_SHA256_SHA512()
-        {
-            // Instanciamos al metodo Hash de la libreria OC.Core.Crypto
-            var [Variable Hash] = new Hash();
-            // Encriptamos el string recibido al metodo MD5/SHA256/SHA512
-			[String Encriptado] = [Variable Hash].[MD5/SHA256/SHA512]([String Sin Encriptar]).ToString();
-        }
-    }
-}
-
-// Encriptar y desencriptar datos en Base64
+// Encriptar y desencriptar datos en Base64 con C#
 using System;
 using System.Text;
 
-namespace [Proyecto]
+namespace Security.Procedure
 {
-    public class MetodoEcriptar2
+    public class Base64
     {
-        string Resultado = string.Empty;
-		
-        public string Encry(string TxtNocry)
+        public static string Base64Encrypt(string Input)
         {
-            byte[] Encriptado = Encoding.Unicode.GetBytes(TxtNocry);
-            Resultado = Convert.ToBase64String(Encriptado);
-            return Resultado;
+            byte[] Bytes = Encoding.Unicode.GetBytes(Input);
+            string Output = Convert.ToBase64String(Bytes);
+            return Output;
         }
 		
-        public string Decry(string TxtEncry)
+        public static string Base64Decrypt(string Input)
         {
-            byte[] Desencriptado = Convert.FromBase64String(TxtEncry);
-            Resultado = Encoding.Unicode.GetString(Desencriptado);
-            return Resultado;
+            byte[] Bytes = Convert.FromBase64String(Input);
+            string Output = Encoding.Unicode.GetString(Bytes);
+            return Output;
         }
     }
 }
 
-/*
-Este proceso solo sirve para encriptar los datos con la librería Eramake.eCryptography
-https://www.nuget.org/packages/Eramake.eCryptography/
-*/
-using Eramake;
+// Clase para encriptar texto con métodos MD5/SHA-1/SHA-256/SHA-512 con C#
+using System.Text;
+using System.Security.Cryptography;
 
-namespace System.Cryp
+namespace Security.Procedure
 {
-    public class EramCryp
+    public class SHA
     {
-        public string TxEncryp, TxDecryp;
-
-        public void Encryp(string Texto)
+        private static string EncryptHash(string Input, HashAlgorithm Method)
         {
-            TxEncryp = eCryptography.Encrypt(Texto);
+            byte[] TextBytes = Encoding.UTF8.GetBytes(Input);
+            byte[] HashBytes = Method.ComputeHash(TextBytes);
+            StringBuilder SB = new StringBuilder();
+            foreach (byte B in HashBytes)
+            {
+                SB.Append(B.ToString("X2"));
+            }
+            return SB.ToString();
         }
-
-        public void Decryp(string Texto)
+		
+        public static string MD5Encrypt(string Input)
         {
-            TxDecryp = eCryptography.Decrypt(Texto);
+            MD5 Md5 = MD5.Create();
+            return EncryptHash(Input, Md5);
+        }
+		
+        public static string SHA1Encrypt(string Input)
+        {
+            SHA1 Sha1 = SHA1.Create();
+            return EncryptHash(Input, Sha1);
+        }
+		
+        public static string SHA256Encrypt(string Input)
+        {
+            SHA256 sha256 = SHA256.Create();
+            return EncryptHash(Input, sha256);
+        }
+		
+        public static string SHA512Encrypt(string Input)
+        {
+            SHA512 sha512 = SHA512.Create();
+            return EncryptHash(Input, sha512);
         }
     }
 }
 
-// Métodos para encriptar y desencriptar texto utilizando el algoritmo AES (Advanced Encryption Standard)
+// Métodos para encriptar y desencriptar texto utilizando el algoritmo AES (Advanced Encryption Standard) con C#
+using System;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace System.oCryp
+namespace [Proyecto]
 {
-    public class AESCry
+    public class AES
     {
 		// Encryption Key (clave de cifrado)
 		private static readonly string key = "0123456789012345"; // Debe ser de 16, 24 o 32 caracteres
         // Initialization Vector (vector de inicialización)
 		private static readonly string iv = "5432109876543210";  // Debe ser de 16 caracteres
 		
-        public static string Encry(string Nocry)
+        public static string AESEncrypt(string Input)
         {
             using (Aes AESAlg = Aes.Create())
             {
@@ -623,7 +671,7 @@ namespace System.oCryp
                     {
                         using (StreamWriter SWe = new StreamWriter(CSe))
                         {
-                            SWe.Write(Nocry);
+                            SWe.Write(Input);
                         }
                         return Convert.ToBase64String(MSe.ToArray());
                     }
@@ -631,7 +679,7 @@ namespace System.oCryp
             }
         }
 		
-        public static string Decry(string Encry)
+        public static string AESDecrypt(string Input)
         {
             using (Aes AESAlg = Aes.Create())
             {
@@ -640,7 +688,7 @@ namespace System.oCryp
 
                 ICryptoTransform Decryptor = AESAlg.CreateDecryptor(AESAlg.Key, AESAlg.IV);
 
-                using (MemoryStream MSd = new MemoryStream(Convert.FromBase64String(Encry)))
+                using (MemoryStream MSd = new MemoryStream(Convert.FromBase64String(Input)))
                 {
                     using (CryptoStream CSd = new CryptoStream(MSd, Decryptor, CryptoStreamMode.Read))
                     {
@@ -654,6 +702,7 @@ namespace System.oCryp
         }
     }
 }
+#endregion
 
 // Procedimiento para eliminar espacios en blanco de un string
 using System.Text;
@@ -688,9 +737,9 @@ namespace [Proyecto]
             var ProjInfo = typeof(Program).Assembly;
             var Atributos = (GuidAttribute)ProjInfo.GetCustomAttributes(typeof(GuidAttribute), true)[0];
             string MyGUID = Atributos.Value.ToString();
-            Mutex mutex = new Mutex(true, "{" + MyGUID +"}");
+            Mutex Mtx = new Mutex(true, "{" + MyGUID +"}");
 			
-			if(mutex.WaitOne(TimeSpan.Zero, true))
+			if(Mtx.WaitOne(TimeSpan.Zero, true))
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
@@ -838,6 +887,48 @@ namespace [Proyecto]
                 VidSource.SignalToStop();
                 VidSource.WaitForStop();
             }
+        }
+    }
+}
+
+// Crear un List<string> con items en negrita(blod) y mostrarlos en un RichTextBox
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+
+namespace [Proyecto]
+{
+    public partial class [Form] : Form
+    {
+		void ListInRichTextBox()
+		{
+			List<string> Lista = new List<string>
+			{
+				@"{\b Item en negrita}",
+                "Item en texto normal"
+			};
+			ShowItems(Lista);
+		}
+		
+		void ShowItems(List<string> Lista)
+        {
+            [RichTextBox].Rtf = BuildRtf(Lista);
+        }
+		
+		string BuildRtf(List<String> Lista)
+        {
+			string FontName = Font.Name; // Obtener el nombre de la fuente del formulario
+            int FontSize = [#FontSize]; // Tamaño de la fuente
+            string RtfCabecera = $@"{{\rtf1\ansi\deff0 {{\fonttbl {{\f0 {FontName};}}}} ";
+            string RtfContenido = "";
+			
+            foreach (String Item in Lista)
+            {
+				RtfContenido += $@"\f0\fs{FontSize * 2} {Item}\par ";
+            }
+			
+            string RtfFinal = "}";
+            return RtfCabecera + RtfContenido + RtfFinal;
         }
     }
 }

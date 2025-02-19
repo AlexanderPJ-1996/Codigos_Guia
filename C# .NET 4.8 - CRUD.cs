@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 // Librerías
 using System.Data;           // Usar Clase DataTable
-using System.IO;             // Usar Clase MemoryStream
-using System.Windows.Forms;  // Usar opciones/componentes de WinForms
-using System.Drawing;        // Usar opciones/componentes de WinForms (Colores, PictureBox, etc...)
 using System.Data.SqlClient; // Microsoft SQL Server
 using System.Data.OleDb;     // Access (2003/2007-2013)
 using System.Data.SQLite;    // SQLite
 using MySqlConnector;        // MySQL
+using System.Windows.Forms;  // Usar opciones/componentes de WinForms
+using System.IO;             // Usar Clase MemoryStream
+using System.Drawing;        // Usar opciones/componentes de WinForms (Colores, PictureBox, etc...)
 
 namespace [Proyecto]
 {
@@ -57,23 +57,20 @@ namespace [Proyecto]
         public void TryCon()
         {
             EConn = false;
-            using (var Conexion = new SqlConnection(Cadena))
+            while (EConn == false)
             {
-                while (EConn == false)
+                try
                 {
-                    try
+                    Conexion.Open();
+                    EConn = true;
+                    Conexion.Close();
+                }
+                catch (SqlException ex)
+                {
+                    EConn = false;
+                    if (MessageBox.Show(ex.Message, Application.ProductName, MessageBoxButtons.RetryCancel, MessageBoxIcon.Exclamation) == DialogResult.Cancel)
                     {
-                        Conexion.Open();
-                        EConn = true;
-                        Conexion.Close();
-                    }
-                    catch (SqlException ex)
-                    {
-                        EConn = false;
-                        if (MessageBox.Show(ex.Message, Application.ProductName, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Cancel)
-                        {
-                            Environment.Exit(0);
-                        }
+                        Environment.Exit(0);
                     }
                 }
             }
@@ -88,7 +85,8 @@ namespace [Proyecto]
                 try
                 {
                     string QSel = "SELECT * FROM [Tabla]";
-                    SqlCommand CMD = new SqlCommand(QSel, Conexion) { CommandType = CommandType.Text };
+                    SqlCommand CMD = new SqlCommand(QSel, Conexion);
+					CMD.CommandType = CommandType.Text;
                     using (SqlDataReader DR = CMD.ExecuteReader())
                     {
                         while (DR.Read())
@@ -119,10 +117,10 @@ namespace [Proyecto]
 		- Verificar existencia de un registro
 		- Login con usuario y/o contraseña
         */
-		public bool ERead;
-		public public void RegEx(string/long/bool [Columna])
+		public bool RegEx(string/long/bool [Columna])
         {
-            using (var Conexion = new SqlConnection(cn.Cadena))
+			bool Read = new bool();
+			using (var Conexion = new SqlConnection(cn.Cadena))
             {
                 Conexion.Open();
                 try
@@ -133,11 +131,11 @@ namespace [Proyecto]
                     SqlDataReader DR = CMD.ExecuteReader();
                     if (DR.HasRows)
                     {
-                        ERead = true;
+                        Read = true;
                     }
                     else
                     {
-                        ERead = false;
+                        Read = false;
                     }
                 }
                 catch (SqlException ex)
@@ -146,6 +144,7 @@ namespace [Proyecto]
                 }
                 Conexion.Close();
             }
+			return ERead;
         }
 		// Instrucciones SQL: SELECT (COUNT, MAX, MIN) para mostrar datos en un TextBox
 		public void TBxText(TextBox TBx)
@@ -157,10 +156,10 @@ namespace [Proyecto]
                 {
                     string QSel = "SELECT COUNT(*) FROM [Tabla]";
                     SqlCommand CMD = new SqlCommand(QSel, Conexion);
-                    var Count = CMD.ExecuteScalar();
-                    if (Count != null)
+                    var Result = CMD.ExecuteScalar();
+                    if (Result != null)
                     {
-                        TBx.Text = Count.ToString();
+                        TBx.Text = Result.ToString();
                     }
                 }
                 catch (SqlException ex)
@@ -180,7 +179,8 @@ namespace [Proyecto]
                 try
                 {
                     string QSel = "SELECT [Columna] FROM [Tabla] ORDER BY [Columna] ASC";
-                    SqlCommand CMD = new SqlCommand(QSel, Conexion) { CommandType = CommandType.Text };
+                    SqlCommand CMD = new SqlCommand(QSel, Conexion);
+					CMD.CommandType = CommandType.Text;
                     using (SqlDataReader DR = CMD.ExecuteReader())
                     {
                         while (DR.Read())
@@ -198,8 +198,9 @@ namespace [Proyecto]
             }
             CBx.DataSource = Lista;
         }
+		public bool Done;
 		// Instrucciones SQL: INSERT, UPDATE y DELETE, DROP y TRUNCATE TABLE con parámetros incluidos
-		void InUpDe(string [Columna 1], int [Columna 2], byte[] [Columna3])
+		public void InUpDe(string [Columna 1], int [Columna 2], byte[] [Columna3])
         {
             using (var Conexion = new SqlConnection(Cadena))
             {
@@ -214,15 +215,35 @@ namespace [Proyecto]
 					CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
 					CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
 					CMD.ExecuteNonQuery();
-					Chang = true;
+					Done = true;
 				}
 				catch (SqlException ex)
 				{
+					Done = false;
 					MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-					Chang = false;
 				}
 				Conexion.Close();
             }
         }
+		
+		// Ejecutar una instrucción sql guardada en un arhivo SQL (*.sql)
+		public void ImportData()
+		{
+			using (var Conexion = new SqlConnection(Cadena))
+			{
+				Conexion.Open();
+				try
+				{
+					string QIns = File.ReadAllText("[Archio].sql");
+					SqlCommand CMD = new SqlCommand(QIns, Conexion);
+					int rowsAffected = CMD.ExecuteNonQuery();
+				}
+				catch (SqlException ex)
+				{
+					MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+				}
+				Conexion.Close();
+			}
+		}
     }
 }
