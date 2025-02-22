@@ -37,8 +37,9 @@ namespace [Proyecto]
 		Data Source=(Ubicación)\[Database].db; Version=3;
 		
 		MySQL
-		Server=[ServerAddress]; Database=[Database]; Uid=[User]; Pwd=[Password];
-		Server=[ServerAddress]; Port=[#Port000]; Database=[Database]; Uid=[User]; Pwd=[Password];
+		Server=[ServerAddress]; Database=[Database]; Uid=[User]; Pwd=[Password]; -- Estandar
+		Server=[ServerAddress]; Port=[#Port000]; Database=[Database]; Uid=[User]; Pwd=[Password]; -- Especificar n° puerto TCP
+		Server=[ServerAddress], [ServerAddress], [ServerAddress]; Database=[Database]; Uid=[User]; Pwd=[Password; -- Servidores múltiples
 		*/
 		
 		/*

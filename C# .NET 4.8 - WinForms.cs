@@ -753,37 +753,6 @@ namespace [Proyecto]
     }
 }
 
-// Procedimiento para permitir una única instancia de un proyecto Windows Forms .NET 5.0
-using System;
-using System.Windows.Forms;
-using System.Threading;
-
-namespace [Proyecto]
-{
-    static class Program
-    {
-        [STAThread]
-        static void Main()
-        {
-            string ProdName = Application.ProductName;
-            bool CreatedNew;
-            using Mutex Mtx = new(true, ProdName, out CreatedNew);
-            {
-                if (CreatedNew)
-                {
-                    Application.SetHighDpiMode(HighDpiMode.SystemAware);
-                    Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-                    Application.Run(new [Form]());
-                }
-                else
-                {
-                    MessageBox.Show("Instancia abierta", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-        }
-    }
-}
 
 // Procedimiento para leer el texto de un archivo de texto y almacenarlo en una variable
 using System.IO;
