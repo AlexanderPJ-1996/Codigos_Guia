@@ -20,14 +20,12 @@ namespace [Proyecto]
 		
 		*/
 		
-		// Declarar variable, en este caso una de tipo string
-		string [Variable];
-		// Declarar variable de acceso público
-		public string [Variable];
-		// Declarar variable de solo lectura
-		readonly string [Variable];
-		// Variable para acceder a procesos y variables de otra
-		private readonly [Clase] [Variable] = new [Clase]();
+		string [Variable]; // Declarar variable, en este caso una de tipo string
+		string? [Variable]; // Aceptar valores null
+		required string [Variable]; // No aceptar valores null
+		public string [Variable]; // Declarar variable de acceso público
+		readonly string [Variable]; // Declarar variable de solo lectura
+		private readonly [Clase] [Variable] = new [Clase](); // Variable para acceder a procesos y variables de otra
 		
 		// Obtener información de ensamblado de aplicación/Proyecto
 		void AppInfo()
@@ -575,7 +573,7 @@ namespace [Proyecto]
 using System;
 using System.Text;
 
-namespace Security.Procedure
+namespace [Proyecto]
 {
     public class Base64
     {
@@ -596,14 +594,15 @@ namespace Security.Procedure
 }
 
 // Clase para encriptar texto con métodos MD5/SHA-1/SHA-256/SHA-512 con C#
+using System;
 using System.Text;
 using System.Security.Cryptography;
 
-namespace Security.Procedure
+namespace [Proyecto]
 {
     public class SHA
     {
-        private static string EncryptHash(string Input, HashAlgorithm Method)
+        private static string HashEncrypt(string Input, HashAlgorithm Method)
         {
             byte[] TextBytes = Encoding.UTF8.GetBytes(Input);
             byte[] HashBytes = Method.ComputeHash(TextBytes);
@@ -618,25 +617,25 @@ namespace Security.Procedure
         public static string MD5Encrypt(string Input)
         {
             MD5 Md5 = MD5.Create();
-            return EncryptHash(Input, Md5);
+            return HashEncrypt(Input, Md5);
         }
 		
         public static string SHA1Encrypt(string Input)
         {
             SHA1 Sha1 = SHA1.Create();
-            return EncryptHash(Input, Sha1);
+            return HashEncrypt(Input, Sha1);
         }
 		
         public static string SHA256Encrypt(string Input)
         {
             SHA256 sha256 = SHA256.Create();
-            return EncryptHash(Input, sha256);
+            return HashEncrypt(Input, sha256);
         }
 		
         public static string SHA512Encrypt(string Input)
         {
             SHA512 sha512 = SHA512.Create();
-            return EncryptHash(Input, sha512);
+            return HashEncrypt(Input, sha512);
         }
     }
 }
@@ -752,7 +751,6 @@ namespace [Proyecto]
         }
     }
 }
-
 
 // Procedimiento para leer el texto de un archivo de texto y almacenarlo en una variable
 using System.IO;

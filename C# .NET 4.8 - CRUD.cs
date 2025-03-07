@@ -145,7 +145,7 @@ namespace [Proyecto]
                 }
                 Conexion.Close();
             }
-			return ERead;
+			return Read;
         }
 		// Instrucciones SQL: SELECT (COUNT, MAX, MIN) para mostrar datos en un TextBox
 		public void TBxText(TextBox TBx)

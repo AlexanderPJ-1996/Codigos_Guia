@@ -1,0 +1,12 @@
+Terminal: CMD/PowerShell
+
+- .NET
+	- dotnet                                            <--> .NET
+	- dotnet new                                        <--> Listado de plantillas más comunes de proyectos .NET
+	- dotnet new list                                   <--> Listado completo de plantillas/archivos de proyectos .NET
+	- dotnet new sln                                    <--> Crear archivo sln,solución de proyecto
+	- dotnet new [Proyecto_Tipo] -n [Proyecto_Nombre]   <--> Crear archivo/proyecto asignando un nombre
+	- dotnet build --configuration Debug                <--> Compilar en Debug
+	- dotnet build --configuration Release              <--> Compilar en Release
+	
+- 
