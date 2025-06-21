@@ -84,6 +84,21 @@ namespace [Proyecto]
 			MemoryStream MS = new MemoryStream();
 			[PictureBox].Image.Save(MS, [PictureBox].Image.RawFormat);
 			byte[] Bytes = MS.GetBuffer();
+			// Cargar imagen en PictureBox
+			string PathFile = @"[Ruta]"; // Ruta de archivo con nombre y extensión incluido
+			[PictureBox].Image = Image.FromFile(PathFile);
+			// Cargar archivo de imagen en memoria para desbloquear archivo
+			using (FileStream FS = new FileStream(PathFile, FileMode.Open, FileAccess.Read))
+			{
+				using (MemoryStream MS = new MemoryStream())
+				{
+					FS.CopyTo(MS);
+					MS.Position = 0;
+					[PictureBox].Image = Image.FromStream(MS);
+				}
+			}
+			// Guardar imagenes cargadas en PictureBox sin un SaveFileDialog
+			[PictureBox].Image.Save(PathFile);
 		}
 		
 		// Solo recibir numeros sin espacios vacios en un TextBox (int 0), mediante evento KeyPress
@@ -467,6 +482,51 @@ namespace [Proyecto]
 	}
 }
 
+// Verificar y crear nuevas carpetas/directorios personalizados y manejo de archivos
+using System;
+using System.IO;
+
+namespace [Proyecto]
+{
+	public class [Clase]
+	{
+		// Captar directorio desde donde se ejecuta la aplicación
+		string PathBase = AppDomain.CurrentDomain.BaseDirectory;
+		
+		void CrearCarpeta()
+		{
+			// Definir ruta de la carpeta/directorio nueva
+			string NewPath1 = Path.Combine(PathBase, @"[Directorio]");
+			// Verificar si la carpeta/directorio existe
+			if (!Directory.Exists(NewPath1))
+			{
+				// Crear nuevo carpeta/directorio
+				Directory.CreateDirectory(NewPath1);
+			}
+			
+			// Definir ruta de subcarpeta/subdirectorio
+			string NewPath2 = Path.Combine(PathBase, @"[Directorio]\[Subdirectorio]");
+			// Verificar si la subcarpeta/subdirectorio existe
+			if (!Directory.Exists(NewPath2))
+			{
+				// Crear nuevo directorio
+				Directory.CreateDirectory(NewPath2);
+			}
+		}
+		// Manejo de archivos
+		void ManejarArchivos()
+		{
+			string Ruta = @"[Ruta]"; // Ruta de archivo con nombre y extensión incluido
+			// Verificar si existe el archivo
+			if (File.Exists(Ruta))
+			{
+				// Eliminar archivo
+				File.Delete(Ruta);
+			}
+		}
+	}
+}
+
 // Procedimiento para abrir una url como hipervínculo
 using System;
 using System.Diagnostics;
@@ -569,77 +629,6 @@ namespace [Proyecto]
     }
 }
 
-// Encriptar y desencriptar datos en Base64 con C#
-using System;
-using System.Text;
-
-namespace [Proyecto]
-{
-    public class Base64
-    {
-        public static string Base64Encrypt(string Input)
-        {
-            byte[] Bytes = Encoding.Unicode.GetBytes(Input);
-            string Output = Convert.ToBase64String(Bytes);
-            return Output;
-        }
-		
-        public static string Base64Decrypt(string Input)
-        {
-            byte[] Bytes = Convert.FromBase64String(Input);
-            string Output = Encoding.Unicode.GetString(Bytes);
-            return Output;
-        }
-    }
-}
-
-// Clase para encriptar texto con métodos MD5/SHA-1/SHA-256/SHA-512 con C#
-using System;
-using System.Text;
-using System.Security.Cryptography;
-
-namespace [Proyecto]
-{
-    public class SHA
-    {
-        private static string HashEncrypt(string Input, HashAlgorithm Method)
-        {
-            byte[] TextBytes = Encoding.UTF8.GetBytes(Input);
-            byte[] HashBytes = Method.ComputeHash(TextBytes);
-            StringBuilder SB = new StringBuilder();
-            foreach (byte B in HashBytes)
-            {
-                SB.Append(B.ToString("X2"));
-            }
-            return SB.ToString();
-        }
-		
-        public static string MD5Encrypt(string Input)
-        {
-            MD5 Md5 = MD5.Create();
-            return HashEncrypt(Input, Md5);
-        }
-		
-        public static string SHA1Encrypt(string Input)
-        {
-            SHA1 Sha1 = SHA1.Create();
-            return HashEncrypt(Input, Sha1);
-        }
-		
-        public static string SHA256Encrypt(string Input)
-        {
-            SHA256 sha256 = SHA256.Create();
-            return HashEncrypt(Input, sha256);
-        }
-		
-        public static string SHA512Encrypt(string Input)
-        {
-            SHA512 sha512 = SHA512.Create();
-            return HashEncrypt(Input, sha512);
-        }
-    }
-}
-
 // Métodos para encriptar y desencriptar texto utilizando el algoritmo AES (Advanced Encryption Standard) con C#
 using System;
 using System.Text;
@@ -701,7 +690,76 @@ namespace [Proyecto]
         }
     }
 }
-#endregion
+
+// Encriptar y desencriptar datos en Base64 con C#
+using System;
+using System.Text;
+
+namespace [Proyecto]
+{
+    public class Base64
+    {
+        public static string Base64Encrypt(string Input)
+        {
+            byte[] Bytes = Encoding.Unicode.GetBytes(Input);
+            string Output = Convert.ToBase64String(Bytes);
+            return Output;
+        }
+		
+        public static string Base64Decrypt(string Input)
+        {
+            byte[] Bytes = Convert.FromBase64String(Input);
+            string Output = Encoding.Unicode.GetString(Bytes);
+            return Output;
+        }
+    }
+}
+
+// Clase para encriptar texto con métodos MD5/SHA-1/SHA-256/SHA-512 con C#
+using System.Text;
+using System.Security.Cryptography;
+
+namespace [Proyecto]
+{
+    public class SHA
+    {
+        private static string HashEncrypt(string Input, HashAlgorithm Method)
+        {
+            byte[] TextBytes = Encoding.UTF8.GetBytes(Input);
+            byte[] HashBytes = Method.ComputeHash(TextBytes);
+            StringBuilder SB = new StringBuilder();
+            foreach (byte B in HashBytes)
+            {
+                SB.Append(B.ToString("X2"));
+            }
+            return SB.ToString();
+        }
+		
+        public static string MD5Encrypt(string Input)
+        {
+            MD5 Md5 = MD5.Create();
+            return HashEncrypt(Input, Md5);
+        }
+		
+        public static string SHA1Encrypt(string Input)
+        {
+            SHA1 Sha1 = SHA1.Create();
+            return HashEncrypt(Input, Sha1);
+        }
+		
+        public static string SHA256Encrypt(string Input)
+        {
+            SHA256 sha256 = SHA256.Create();
+            return HashEncrypt(Input, sha256);
+        }
+		
+        public static string SHA512Encrypt(string Input)
+        {
+            SHA512 sha512 = SHA512.Create();
+            return HashEncrypt(Input, sha512);
+        }
+    }
+}
 
 // Procedimiento para eliminar espacios en blanco de un string
 using System.Text;
@@ -715,7 +773,9 @@ namespace [Proyecto]
 		
 		void RemoverVacio()
 		{
-			[String sin Espacios] = Regex.Replace("String con Espacios", @"\s", string.Empty);
+			string [String sin Espacios] = Regex.Replace("String con Espacios", @"\s", string.Empty);
+			// Con Replace() no se requiere de la librería System.Text.RegularExpressions
+			string [String sin Espacios] = [TextBox/RichTextBox/Label].Text.Replace(" ", string.Empty);
 		}
 	}
 }
@@ -882,14 +942,14 @@ namespace [Proyecto]
             [RichTextBox].Rtf = BuildRtf(Lista);
         }
 		
-		string BuildRtf(List<String> Lista)
+		string BuildRtf(List<string> Lista)
         {
 			string FontName = Font.Name; // Obtener el nombre de la fuente del formulario
             int FontSize = [#FontSize]; // Tamaño de la fuente
             string RtfCabecera = $@"{{\rtf1\ansi\deff0 {{\fonttbl {{\f0 {FontName};}}}} ";
             string RtfContenido = "";
 			
-            foreach (String Item in Lista)
+            foreach (string Item in Lista)
             {
 				RtfContenido += $@"\f0\fs{FontSize * 2} {Item}\par ";
             }

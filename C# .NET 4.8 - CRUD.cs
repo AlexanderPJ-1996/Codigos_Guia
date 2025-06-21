@@ -52,7 +52,8 @@ namespace [Proyecto]
 		deberá de declararse: var Conexion = new SqlConnection(Cadena); al principio de cada método que 
 		utlice la variable [Conexion]
 		*/
-		private readonly string Cadena = @"[ConnectionString]";
+		private readonly string CoString = @"[ConnectionString]";
+		
         // Iniciar y probar conexión con base de datos
 		bool EConn;
         public void TryCon()
@@ -60,54 +61,59 @@ namespace [Proyecto]
             EConn = false;
             while (EConn == false)
             {
-                try
-                {
-                    Conexion.Open();
-                    EConn = true;
-                    Conexion.Close();
-                }
-                catch (SqlException ex)
-                {
-                    EConn = false;
-                    if (MessageBox.Show(ex.Message, Application.ProductName, MessageBoxButtons.RetryCancel, MessageBoxIcon.Exclamation) == DialogResult.Cancel)
-                    {
-                        Environment.Exit(0);
-                    }
-                }
+                using (var Conexion = new SqlConnection(CoString))
+				{
+					try
+					{
+						Conexion.Open();
+						EConn = true;
+						Conexion.Close();
+					}
+					catch (Exception ex)
+					{
+						EConn = false;
+						if (MessageBox.Show(ex.Message, Application.ProductName, MessageBoxButtons.RetryCancel, MessageBoxIcon.Exclamation) == DialogResult.Cancel)
+						{
+							Environment.Exit(0);
+						}
+					}
+				}
             }
         }
 		// Instrucciones SQL: SELECT para mostrar datos en un DataGridView, cargar BindingSource para ReportViewer
 		public List<ClaseTabla> Cargar()
         {
             List<ClaseTabla> Lista = new List<ClaseTabla>();
-            using (var Conexion = new SqlConnection(Cadena))
+            using (var Conexion = new SqlConnection(CoString))
             {
                 Conexion.Open();
                 try
                 {
                     string QSel = "SELECT * FROM [Tabla]";
-                    SqlCommand CMD = new SqlCommand(QSel, Conexion);
-					CMD.CommandType = CommandType.Text;
-                    using (SqlDataReader DR = CMD.ExecuteReader())
-                    {
-                        while (DR.Read())
-                        {
-                            Lista.Add(new ClaseTabla()
-                            {
-								[INTEGER/BIGINT] = Convert.ToInt32(DR["[INTEGER/BIGINT]"]),
-								[VARCHAR] = DR["[VARCHAR]"].ToString(),
-								[DOUBLE/DECIMAL] = Convert.ToDouble/ToDecimal(DR["[DOUBLE/DECIMAL]"]),
-								[DateTime] = Convert.ToDateTime(DR["[DateTime]"]),
-								[BOOLEAN/BIT] = Convert.ToBoolean(DR["[BOOLEAN/BIT]"]),
-								[BYTE] = (byte[])DR["BYTE"]
-                            });
-                        }
-                    }
+                    using (SqlCommand CMD = new SqlCommand(QSel, Conexion))
+					{
+						CMD.CommandType = CommandType.Text;
+						using (SqlDataReader DR = CMD.ExecuteReader())
+						{
+							while (DR.Read())
+							{
+								Lista.Add(new ClaseTabla()
+								{
+									[INTEGER/BIGINT] = Convert.ToInt32(DR["[INTEGER/BIGINT]"]),
+									[VARCHAR] = DR["[VARCHAR]"].ToString(),
+									[DOUBLE/DECIMAL] = Convert.ToDouble/ToDecimal(DR["[DOUBLE/DECIMAL]"]),
+									[DateTime] = Convert.ToDateTime(DR["[DateTime]"]),
+									[BOOLEAN/BIT] = Convert.ToBoolean(DR["[BOOLEAN/BIT]"]),
+									[BYTE] = (byte[])DR["BYTE"]
+								});
+							}
+						}
+					}
                 }
-                catch (SqlException ex)
+                catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     Lista = new List<ClaseTabla>();
+					MessageBox.Show(ex.Message);
                 }
                 Conexion.Close();
             }
@@ -121,78 +127,90 @@ namespace [Proyecto]
 		public bool RegEx(string/long/bool [Columna])
         {
 			bool Read = new bool();
-			using (var Conexion = new SqlConnection(cn.Cadena))
+			using (var Conexion = new SqlConnection(CoString))
             {
                 Conexion.Open();
                 try
                 {
                     string QSel = "SELECT * FROM [Tabla] WHERE ([Columna] = @[Columna])";
-                    SqlCommand CMD = new SqlCommand(QSel, Conexion);
-					CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
-                    SqlDataReader DR = CMD.ExecuteReader();
-                    if (DR.HasRows)
-                    {
-                        Read = true;
-                    }
-                    else
-                    {
-                        Read = false;
-                    }
+                    using (SqlCommand CMD = new SqlCommand(QSel, Conexion))
+					{
+						CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
+						using (SqlDataReader DR = CMD.ExecuteReader())
+						{
+							if (DR.HasRows)
+							{
+								Read = true;
+							}
+							else
+							{
+								Read = false;
+							}
+						}
+					}
                 }
-                catch (SqlException ex)
+                catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    Read = false;
+					MessageBox.Show(ex.Message);
                 }
                 Conexion.Close();
             }
 			return Read;
         }
 		// Instrucciones SQL: SELECT (COUNT, MAX, MIN) para mostrar datos en un TextBox
-		public void TBxText(TextBox TBx)
+		public string TBxText(TextBox TBx)
         {
-            using (var Conexion = new SqlConnection(cn.Cadena))
+            string Output = string.Empty;
+			using (var Conexion = new SqlConnection(CoString))
             {
                 Conexion.Open();
                 try
                 {
                     string QSel = "SELECT COUNT(*) FROM [Tabla]";
-                    SqlCommand CMD = new SqlCommand(QSel, Conexion);
-                    var Result = CMD.ExecuteScalar();
-                    if (Result != null)
-                    {
-                        TBx.Text = Result.ToString();
-                    }
+                    using (SqlCommand CMD = new SqlCommand(QSel, Conexion))
+					{
+						var Result = CMD.ExecuteScalar();
+						if (Result != null)
+						{
+							Output = Result.ToString();
+						}
+					}
                 }
-                catch (SqlException ex)
+                catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    string Output = string.Empty;
+					MessageBox.Show(ex.Message);
                 }
                 Conexion.Close();
             }
+			return Output;
         }
         // Instrucciones SQL: SELECT para rellenar un ComboBox
 		public void RelleCBx(ComboBox CBx)
         {
             List<string> Lista = new List<string>();
-            using (var Conexion = new SqlConnection(cn.Cadena))
+            using (var Conexion = new SqlConnection(CoString))
             {
                 Conexion.Open();
                 try
                 {
                     string QSel = "SELECT [Columna] FROM [Tabla] ORDER BY [Columna] ASC";
-                    SqlCommand CMD = new SqlCommand(QSel, Conexion);
-					CMD.CommandType = CommandType.Text;
-                    using (SqlDataReader DR = CMD.ExecuteReader())
-                    {
-                        while (DR.Read())
-                        {
-                            Lista.Add(DR["[Columna]"].ToString());
-                        }
-                    }
+                    using (SqlCommand CMD = new SqlCommand(QSel, Conexion))
+					{
+						CMD.CommandType = CommandType.Text;
+						using (SqlDataReader DR = CMD.ExecuteReader())
+						{
+							while (DR.Read())
+							{
+								Lista.Add(DR["[Columna]"].ToString());
+							}
+						}
+					}
                 }
-                catch (SqlException ex)
+                catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show(ex.Message);
                     Lista = new List<string>();
                 }
                 Conexion.Close();
@@ -203,7 +221,7 @@ namespace [Proyecto]
 		// Instrucciones SQL: INSERT, UPDATE y DELETE, DROP y TRUNCATE TABLE con parámetros incluidos
 		public void InUpDe(string [Columna 1], int [Columna 2], byte[] [Columna3])
         {
-            using (var Conexion = new SqlConnection(Cadena))
+            using (var Conexion = new SqlConnection(CoString))
             {
                 Conexion.Open();
 				try
@@ -211,17 +229,19 @@ namespace [Proyecto]
 					string QIns = "INSERT INTO [Tabla] ([Columna 1], [Columna 3]) VALUES (@[Columna 1], @[Columna 3])";
 					string QUpd = "UPDATE [Tabla] SET [Columna 1] = @[Columna 1], [Columna 3] = @[Columna 3] WHERE ([Columna 2] = @[Columna 2])";
 					string QDel = "DELETE FROM [Tabla] WHERE ([Columna 2] = @[Columna 2])";
-					SqlCommand CMD = new SqlCommand([Variable], Conexion);
-					CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
-					CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
-					CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
-					CMD.ExecuteNonQuery();
-					Done = true;
+					using (SqlCommand CMD = new SqlCommand([Variable], Conexion))
+					{
+						CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
+						CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
+						CMD.Parameters.AddWithValue("@[Columna]", [Columna]);
+						CMD.ExecuteNonQuery();
+						Done = true;
+					}
 				}
-				catch (SqlException ex)
+				catch (Exception ex)
 				{
 					Done = false;
-					MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+					MessageBox.Show(ex.Message);
 				}
 				Conexion.Close();
             }
@@ -230,18 +250,20 @@ namespace [Proyecto]
 		// Ejecutar una instrucción sql guardada en un arhivo SQL (*.sql)
 		public void ImportData()
 		{
-			using (var Conexion = new SqlConnection(Cadena))
+			using (var Conexion = new SqlConnection(CoString))
 			{
 				Conexion.Open();
 				try
 				{
 					string QIns = File.ReadAllText("[Archio].sql");
-					SqlCommand CMD = new SqlCommand(QIns, Conexion);
-					int rowsAffected = CMD.ExecuteNonQuery();
+					using (SqlCommand CMD = new SqlCommand(QIns, Conexion))
+					{
+						long rowsAffected = CMD.ExecuteNonQuery();
+					}
 				}
-				catch (SqlException ex)
+				catch (Exception ex)
 				{
-					MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+					MessageBox.Show(ex.Message);
 				}
 				Conexion.Close();
 			}

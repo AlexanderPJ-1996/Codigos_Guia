@@ -95,7 +95,6 @@ FROM 'Nombre_Tabla'
 GROUP BY 'Nombre_Columna1';
 
 
-
 -- Instrucciones para mostrar tablas existentes en bases de datos
 --
 

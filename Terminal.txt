@@ -1,6 +1,7 @@
 Terminal: CMD/PowerShell
 
 - .NET
+
 	- dotnet                                            <--> .NET
 	- dotnet new                                        <--> Listado de plantillas más comunes de proyectos .NET
 	- dotnet new list                                   <--> Listado completo de plantillas/archivos de proyectos .NET
@@ -9,4 +10,9 @@ Terminal: CMD/PowerShell
 	- dotnet build --configuration Debug                <--> Compilar en Debug
 	- dotnet build --configuration Release              <--> Compilar en Release
 	
+- Visual Studio Community 2019 (PowerShell)
+
+	- MSBuild [Proyecto].sln /p:Configuration=Debug     <--> Compilar en Debug
+	- MSBuild [Proyecto].sln /p:Configuration=Release   <--> Compilar en Release
+
 - 
