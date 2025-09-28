@@ -461,7 +461,7 @@ namespace [Proyecto]
         }
 		
 		// Procedimiento para unir parte entera y parte decimal como valor double
-		void StringToDouvle()
+		void StringToDouble()
 		{
 			string Partes = "[ParteEntera]" + "," + "[ParteDecimal]";
 			double Numero = Convert.ToDouble(Partes);

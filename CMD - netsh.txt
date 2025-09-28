@@ -1,0 +1,40 @@
+¡Claro, Alexander! Aquí tienes algunos comandos útiles de `netsh` que puedes usar en el símbolo del sistema para optimizar tu conexión a Internet:
+
+1. **Restablecer el catálogo Winsock**:
+   ```cmd
+   netsh winsock reset
+   ```
+   Esto puede solucionar problemas relacionados con los sockets de red.
+
+2. **Habilitar o ajustar configuraciones TCP**:
+   - Habilitar descarga de TCP Chimney (puede estar obsoleto en algunos sistemas):
+     ```cmd
+     netsh int tcp set global chimney=enabled
+     ```
+   - Desactivar Auto-Tuning TCP:
+     ```cmd
+     netsh int tcp set global autotuninglevel=normal
+     ```
+   - Habilitar Escala del lado de recepción:
+     ```cmd
+     netsh int tcp set global rss=enabled
+     ```
+   - Habilitar TCP Compuesto (para Windows 10):
+     ```cmd
+     netsh int tcp set global congestionprovider=ctcp
+     ```
+
+3. **Optimizar el acceso directo a la caché (Direct Cache Access)**:
+   ```cmd
+   netsh int tcp set global dca=enabled
+   ```
+
+4. **Evitar la limitación de velocidad en streaming**:
+   Si sospechas que tu proveedor de Internet está limitando tu conexión durante el streaming, puedes usar este comando:
+   ```cmd
+   netsh advfirewall firewall add rule name="StopThrottling" dir=in action=block remoteip=173.194.55.0/24,206.111.0.0/16 enable=yes
+   ```
+
+Recuerda ejecutar estos comandos en el símbolo del sistema con privilegios de administrador y reiniciar tu PC después de aplicarlos para que los cambios surtan efecto. Si algo no funciona como esperas, puedes desactivar las configuraciones reemplazando `enabled` por `disabled`.
+
+¿Te gustaría más detalles sobre alguno de estos comandos? 😊

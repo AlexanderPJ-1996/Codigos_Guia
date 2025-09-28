@@ -93,7 +93,23 @@ GROUP BY 'Nombre_Columna1';
 SELECT 'Nombre_Columna1', GROUP_CONCAT('Nombre_Columna2' SEPARATOR ', ') AS 'Nombre_Columna' 
 FROM 'Nombre_Tabla' 
 GROUP BY 'Nombre_Columna1';
+-- SQLite
+SELECT 'Nombre_Columna1', GROUP_CONCAT('Nombre_Columna2', ', ') AS 'Nombre_Columna' 
+FROM 'Nombre_Tabla' 
+GROUP BY 'Nombre_Columna1';
 
+-- Crear llaves o claves
+--
+
+-- Llave primaria
+PRIMARY KEY ('Nombre_Columna')
+
+-- Crear llave/clave foraneas o FOREIGN KEY
+-- FOREIGN KEY: señala la columna de la Tabla
+-- REFERENCES: señala la tabla externa y la columna de dicha tabla para crear llave/clave foranea
+-- ON DELETE CASCADE: señala si los registros enlazados se eliminarar al eliminar registros en tabla externa
+-- ON UPDATE CASCADE: señala si los registros enlazados se actualizarán al editar registros en tabla externa
+FOREIGN KEY ('Nombre_Columna') REFERENCES 'Nombre_Tabla'('Nombre_Columna_Tabla') ON UPDATE CASCADE ON DELETE CASCADE
 
 -- Instrucciones para mostrar tablas existentes en bases de datos
 --
