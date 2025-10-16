@@ -179,7 +179,7 @@ namespace [Proyecto]
                 }
                 catch (Exception ex)
                 {
-                    string Output = string.Empty;
+                    Output = string.Empty;
 					MessageBox.Show(ex.Message);
                 }
                 Conexion.Close();

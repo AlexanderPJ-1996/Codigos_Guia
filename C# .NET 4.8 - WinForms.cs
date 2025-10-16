@@ -21,8 +21,6 @@ namespace [Proyecto]
 		*/
 		
 		string [Variable]; // Declarar variable, en este caso una de tipo string
-		string? [Variable]; // Aceptar valores null
-		required string [Variable]; // No aceptar valores null
 		public string [Variable]; // Declarar variable de acceso público
 		readonly string [Variable]; // Declarar variable de solo lectura
 		private readonly [Clase] [Variable] = new [Clase](); // Variable para acceder a procesos y variables de otra
@@ -325,6 +323,41 @@ namespace [Proyecto]
                 }
             }
 		}
+		// Versión mejorada
+		void OpenFile()
+		{
+			OpenFileDialog OFileD = new OpenFileDialog
+			{
+				Filter = "Imagenes PNG|*.png|" + 
+				"Imagenes JPG/JPEG|*.jpg;*.jpeg|" + 
+				"Imagenes GIF|*.gif|" + 
+				"Imagenes BMP|*.bmp|" + 
+				"Todos los archivos|*.*",
+				Title = "Seleccionar imagen",
+				FilterIndex = 1,
+				RestoreDirectory = true
+			};
+			
+			if (OFileD.ShowDialog() == DialogResult.OK)
+			{
+				try
+				{
+					using (FileStream FS = new FileStream(OFileD.FileName, FileMode.Open, FileAccess.Read))
+					{
+						using (MemoryStream MS = new MemoryStream())
+						{
+							FS.CopyTo(MS);
+							MS.Seek(0, SeekOrigin.Begin);
+							PBxFoto.Image = Image.FromStream(MS);
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message);
+				}
+			}
+		}
 		
 		// Configurar SaveFileDialog para guardar imagen desde un PictureBox
 		void SaveFile()
@@ -366,7 +399,8 @@ namespace [Proyecto]
             }
             Form Frm = Modulo as Form;
             Frm.TopLevel = false;
-            Frm.Dock = DockStyle.Fill;
+            Frm.FormBorderStyle = FormBorderStyle.None;
+			Frm.Dock = DockStyle.Fill;
             Frm.BackColor = BackColor;
             Pnl.Controls.Add(Frm);
             Pnl.Tag = Frm;
@@ -527,6 +561,65 @@ namespace [Proyecto]
 	}
 }
 
+// Procedimiento para leer el texto de un archivo de texto y almacenarlo en una variable
+using System.IO;
+using System.Windows.Forms;
+
+namespace [Proyecto]
+{
+	public class LeerFileText
+	{
+		string FileText()
+		{
+			string Ruta = @"[Ruta]";
+			string Output = string.Empty;
+			string Line = string.Empty;
+			if (File.Exists(Ruta))
+			{
+				using (StreamReader SR = new StreamReader(Ruta))
+				{
+					try
+					{
+						Line = SR.ReadLine();
+						while (Line != null)
+						{
+							Output = Line;
+							Line = SR.ReadLine();
+						}
+					}
+					catch (Exception)
+					{
+						Output = string.Empty;
+					}
+				}
+			}
+			return Output;
+		}
+		
+		
+		string [Variable];
+		void FileText()
+		{
+			string Line;
+			try
+			{
+				StreamReader SR = new StreamReader("[Archivo]");
+				Line = SR.ReadLine();
+				while (Line != null)
+				{
+					[Variable] = Line;
+					Line = SR.ReadLine();
+				}
+				SR.Close();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+			}
+		}
+	}
+}
+
 // Procedimiento para abrir una url como hipervínculo
 using System;
 using System.Diagnostics;
@@ -629,6 +722,30 @@ namespace [Proyecto]
     }
 }
 
+// Encriptar y desencriptar datos en Base64 con C#
+using System;
+using System.Text;
+
+namespace [Proyecto]
+{
+    public class Base64
+    {
+        public static string Base64Encrypt(string Input)
+        {
+            byte[] Bytes = Encoding.Unicode.GetBytes(Input);
+            string Output = Convert.ToBase64String(Bytes);
+            return Output;
+        }
+		
+        public static string Base64Decrypt(string Input)
+        {
+            byte[] Bytes = Convert.FromBase64String(Input);
+            string Output = Encoding.Unicode.GetString(Bytes);
+            return Output;
+        }
+    }
+}
+
 // Métodos para encriptar y desencriptar texto utilizando el algoritmo AES (Advanced Encryption Standard) con C#
 using System;
 using System.Text;
@@ -687,30 +804,6 @@ namespace [Proyecto]
                     }
                 }
             }
-        }
-    }
-}
-
-// Encriptar y desencriptar datos en Base64 con C#
-using System;
-using System.Text;
-
-namespace [Proyecto]
-{
-    public class Base64
-    {
-        public static string Base64Encrypt(string Input)
-        {
-            byte[] Bytes = Encoding.Unicode.GetBytes(Input);
-            string Output = Convert.ToBase64String(Bytes);
-            return Output;
-        }
-		
-        public static string Base64Decrypt(string Input)
-        {
-            byte[] Bytes = Convert.FromBase64String(Input);
-            string Output = Encoding.Unicode.GetString(Bytes);
-            return Output;
         }
     }
 }
@@ -810,37 +903,6 @@ namespace [Proyecto]
             }
         }
     }
-}
-
-// Procedimiento para leer el texto de un archivo de texto y almacenarlo en una variable
-using System.IO;
-using System.Windows.Forms;
-
-namespace [Proyecto]
-{
-	public class LeerFileText
-	{
-		string [Variable];
-		void FileText()
-		{
-			string Line;
-			try
-			{
-				StreamReader SR = new StreamReader("[Archivo]");
-				Line = SR.ReadLine();
-				while (Line != null)
-				{
-					[Variable] = Line;
-					Line = SR.ReadLine();
-				}
-				SR.Close();
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-			}
-		}
-	}
 }
 
 /*
